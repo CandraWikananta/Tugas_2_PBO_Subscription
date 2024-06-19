@@ -73,4 +73,16 @@ public class CustomerController {
         }
         return customer;
     }
+
+    public boolean deleteCustomer(int id) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "DELETE FROM Customer WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            int rowsDeleted = pstmt.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
 }
