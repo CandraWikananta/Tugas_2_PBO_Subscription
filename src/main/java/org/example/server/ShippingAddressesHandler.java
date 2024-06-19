@@ -2,19 +2,18 @@ package org.example.server;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-import org.example.controller.CustomerController;
-import org.example.models.Customer;
+import org.example.controller.ShippingAddressesController;
+import org.example.models.Shipping_addresses;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
-
-public class CustomerHandler implements HttpHandler {
+public class ShippingAddressesHandler implements HttpHandler {
     private final String apiKey;
-    private final CustomerController controller = new CustomerController();
+    private final ShippingAddressesController shippingAddressController = new ShippingAddressesController();
 
-    public CustomerHandler(String apiKey) {
+    public ShippingAddressesHandler(String apiKey) {
         this.apiKey = apiKey;
     }
 
@@ -30,30 +29,29 @@ public class CustomerHandler implements HttpHandler {
         }
 
         String method = t.getRequestMethod();
+        String path = t.getRequestURI().getPath();
         if (method.equals("GET")) {
-            handleGetRequest(t);
-        } else if (method.equals("POST")) {
-            handlePostRequest(t);
+            handleGetShippingAddressRequest(t);
         } else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
     }
 
-    private void handleGetRequest(HttpExchange t) throws IOException {
+    private void handleGetShippingAddressRequest(HttpExchange t) throws IOException {
         String path = t.getRequestURI().getPath();
         String[] pathComponents = path.split("/");
         if (pathComponents.length == 3) {
             try {
                 int id = Integer.parseInt(pathComponents[2]);
-                Customer customer = controller.getCustomerById(id);
-                if (customer != null) {
-                    String json = new Gson().toJson(customer);
+                Shipping_addresses shippingAddress = shippingAddressController.getShippingAddressById(id);
+                if (shippingAddress != null) {
+                    String json = new Gson().toJson(shippingAddress);
                     t.sendResponseHeaders(200, json.length());
                     OutputStream os = t.getResponseBody();
                     os.write(json.getBytes());
                     os.close();
                 } else {
-                    String response = "Customer not found";
+                    String response = "Shipping Address not found";
                     t.sendResponseHeaders(404, response.length());
                     OutputStream os = t.getResponseBody();
                     os.write(response.getBytes());
@@ -67,23 +65,12 @@ public class CustomerHandler implements HttpHandler {
                 os.close();
             }
         } else {
-            List<Customer> customers = controller.getAllCustomers();
-            String json = new Gson().toJson(customers);
+            List<Shipping_addresses> shippingAddresses = shippingAddressController.getAllShippingAddresses();
+            String json = new Gson().toJson(shippingAddresses);
             t.sendResponseHeaders(200, json.length());
             OutputStream os = t.getResponseBody();
             os.write(json.getBytes());
             os.close();
         }
-    }
-
-    private void handlePostRequest(HttpExchange t) throws IOException {
-        InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
-        Customer customer = new Gson().fromJson(isr, Customer.class);
-        boolean success = controller.addCustomer(customer);
-        String response = success ? "Error creating customer" : "Customer created successfully";
-        t.sendResponseHeaders(success ? 500 : 201, response.length());
-        OutputStream os = t.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
     }
 }

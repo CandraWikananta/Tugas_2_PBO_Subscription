@@ -1,6 +1,6 @@
 package org.example.models;
 
-public class shipping_addresses {
+public class Shipping_addresses {
     private int id;
     private int customer;
     private String title;
@@ -10,7 +10,7 @@ public class shipping_addresses {
     private String province;
     private String postcode;
 
-    public shipping_addresses(String postcode, String province, String city, String line2, String line1, String title, int customer, int id) {
+    public Shipping_addresses(String postcode, String province, String city, String line2, String line1, String title, int customer, int id) {
         this.postcode = postcode;
         this.province = province;
         this.city = city;
@@ -19,6 +19,10 @@ public class shipping_addresses {
         this.title = title;
         this.customer = customer;
         this.id = id;
+    }
+
+    public Shipping_addresses(){
+
     }
 
     public int getId() {
