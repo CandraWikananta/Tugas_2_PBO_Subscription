@@ -78,7 +78,7 @@ public class CustomerHandler implements HttpHandler {
         } else if (pathComponents.length == 4 && "Subscriptions".equals(pathComponents[3])) { // jika GET/customers/{id}/subscriptions
             try {
                 int customerId = Integer.parseInt(pathComponents[2]);
-                if (query != null && query.startsWith("subscriptions_status=")) {
+                if (query != null && query.startsWith("subscriptions_status=")) { // jika GET/customers/{id}/subscriptions?subscription_status={active, cancelled}
                     String status = query.split("=")[1];
                     List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerIdAndStatus(customerId, status);
                     String json = new Gson().toJson(subscriptions);

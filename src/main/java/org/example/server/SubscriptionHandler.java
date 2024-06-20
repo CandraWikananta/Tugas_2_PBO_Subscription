@@ -8,8 +8,10 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SubscriptionHandler implements HttpHandler {
     private final String apiKey;
@@ -40,19 +42,51 @@ public class SubscriptionHandler implements HttpHandler {
     }
 
     private void handleGetSubscriptionRequest(HttpExchange t) throws IOException {
-        String query = t.getRequestURI().getQuery();
-        Map<String, String> params = queryToMap(query);
-        String sortBy = params.get("sort_by");
-        String sortType = params.get("sort_type");
+        String path = t.getRequestURI().getPath();
+        String[] pathComponents = path.split("/");
 
-        List<Subscriptions> subscriptions = subscriptionController.getAllSubscription(sortBy, sortType);
-        String json = new Gson().toJson(subscriptions);
-        t.sendResponseHeaders(200, json.length());
-        OutputStream os = t.getResponseBody();
-        os.write(json.getBytes());
-        os.close();
+        if (pathComponents.length == 3) { // Expecting /subscriptions/{id}
+            try {
+                int id = Integer.parseInt(pathComponents[2]);
+                Subscriptions subscription = subscriptionController.getSubscriptionById(id);
+                if (subscription != null) {
+                    String json = new Gson().toJson(subscription);
+                    t.sendResponseHeaders(200, json.length());
+                    OutputStream os = t.getResponseBody();
+                    os.write(json.getBytes());
+                    os.close();
+                } else {
+                    String response = "Subscription not found";
+                    t.sendResponseHeaders(404, response.length());
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else if (pathComponents.length == 2) { // Expecting /subscriptions
+            String query = t.getRequestURI().getQuery();
+            Map<String, String> params = queryToMap(query);
+            String sortBy = params.get("sort_by");
+            String sortType = params.get("sort_type");
+
+            List<Subscriptions> subscriptions = subscriptionController.getAllSubscription(sortBy, sortType);
+            String json = new Gson().toJson(subscriptions);
+            t.sendResponseHeaders(200, json.length());
+            OutputStream os = t.getResponseBody();
+            os.write(json.getBytes());
+            os.close();
+        } else {
+            t.sendResponseHeaders(404, -1); // Not Found
+        }
     }
 
+    // POST Subscriptions
     private void handlePostSubscriptionRequest(HttpExchange t) throws IOException {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Subscriptions subscriptions = new Gson().fromJson(isr, Subscriptions.class);
@@ -77,4 +111,15 @@ public class SubscriptionHandler implements HttpHandler {
         }
         return result;
     }
+
+//    private Map<String, String> queryToMap(String query) {
+//        if (query == null) return Map.of();
+//        return Arrays.stream(query.split("&"))
+//                .map(param -> param.split("="))
+//                .collect(Collectors.toMap(
+//                        pair -> pair[0],
+//                        pair -> pair.length > 1 ? pair[1] : ""));
+//    }
+
+
 }

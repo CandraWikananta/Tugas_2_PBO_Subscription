@@ -1,18 +1,24 @@
 package org.example.models;
 
-public class subscription_items {
+public class Subscription_items {
     private int subscription;
     private int item;
     private int quantity;
     private int price;
     private int amount;
 
-    public subscription_items(int amount, int price, int quantity, int item, int subscription) {
+    private Items itemDetails;
+
+    public Subscription_items(int amount, int price, int quantity, int item, int subscription) {
         this.amount = amount;
         this.price = price;
         this.quantity = quantity;
         this.item = item;
         this.subscription = subscription;
+    }
+
+    public Subscription_items(){
+
     }
 
     public int getSubscription() {
@@ -53,5 +59,13 @@ public class subscription_items {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public Items getItemDetails() {
+        return itemDetails;
+    }
+
+    public void setItemDetails(Items itemDetails) {
+        this.itemDetails = itemDetails;
     }
 }

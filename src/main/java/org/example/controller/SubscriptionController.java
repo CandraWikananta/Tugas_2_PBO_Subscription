@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.models.Subscriptions;
+import org.example.models.*;
 import org.example.server.DatabaseConnection;
 
 import java.sql.*;
@@ -25,7 +25,7 @@ public class SubscriptionController {
                 subs.setTotal_due(rs.getInt("total_due"));
                 subs.setActivated_at(rs.getString("activated_at"));
                 subs.setCurrent_term_start(rs.getString("current_term_start"));
-                subs.setGetCurrent_term_end(rs.getString("current_term_end"));
+                subs.setCurrent_term_end(rs.getString("current_term_end"));
                 subs.setStatus(rs.getString("status"));
                 subscriptions.add(subs);
             }
@@ -47,7 +47,7 @@ public class SubscriptionController {
             pstmt.setInt(5, subscriptions.getTotal_due());
             pstmt.setString(6, subscriptions.getActivated_at());
             pstmt.setString(7, subscriptions.getCurrent_term_start());
-            pstmt.setString(8, subscriptions.getGetCurrent_term_end());
+            pstmt.setString(8, subscriptions.getCurrent_term_end());
             pstmt.setString(9, subscriptions.getStatus());
             int rowsInserted = pstmt.executeUpdate();
             if(rowsInserted > 0){
@@ -80,7 +80,7 @@ public class SubscriptionController {
                 subs.setTotal_due(rs.getInt("total_due"));
                 subs.setActivated_at(rs.getString("activated_at"));
                 subs.setCurrent_term_start(rs.getString("current_term_start"));
-                subs.setGetCurrent_term_end(rs.getString("current_term_end"));
+                subs.setCurrent_term_end(rs.getString("current_term_end"));
                 subs.setStatus(rs.getString("status"));
                 subscriptions.add(subs);
             }
@@ -107,7 +107,7 @@ public class SubscriptionController {
                 subs.setTotal_due(rs.getInt("total_due"));
                 subs.setActivated_at(rs.getString("activated_at"));
                 subs.setCurrent_term_start(rs.getString("current_term_start"));
-                subs.setGetCurrent_term_end(rs.getString("current_term_end"));
+                subs.setCurrent_term_end(rs.getString("current_term_end"));
                 subs.setStatus(rs.getString("status"));
                 subscriptions.add(subs);
             }
@@ -115,5 +115,57 @@ public class SubscriptionController {
             e.printStackTrace();
         }
         return subscriptions;
+    }
+
+    public Subscriptions getSubscriptionById(int subscriptionId) {
+        Subscriptions subscription = null;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT s.*, c.id as customer_id, c.first_name, c.last_name, c.email, c.phone_number, " +
+                    "si.quantity, si.amount, i.id as item_id, i.name as item_name, i.price as item_price, i.type as item_type " +
+                    "FROM Subscriptions s " +
+                    "JOIN Customer c ON s.customer = c.id " +
+                    "JOIN Subscription_items si ON s.id = si.subscription " +
+                    "JOIN Items i ON si.item = i.id " +
+                    "WHERE s.id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, subscriptionId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                if (subscription == null) {
+                    subscription = new Subscriptions();
+                    subscription.setId(rs.getInt("id"));
+                    subscription.setBilling_period(rs.getInt("billing_period"));
+                    subscription.setBilling_period_unit(rs.getString("billing_period_unit"));
+                    subscription.setTotal_due(rs.getInt("total_due"));
+                    subscription.setActivated_at(rs.getString("activated_at"));
+                    subscription.setCurrent_term_start(rs.getString("current_term_start"));
+                    subscription.setCurrent_term_end(rs.getString("current_term_end"));
+                    subscription.setStatus(rs.getString("status"));
+
+                    Customer customer = new Customer();
+                    customer.setId(rs.getInt("customer_id"));
+                    customer.setFirst_name(rs.getString("first_name"));
+                    customer.setLast_name(rs.getString("last_name"));
+                    subscription.setCustomer(customer.getId());
+                    subscription.setCustomerDetails(customer);
+                }
+
+                Subscription_items subscriptionItem = new Subscription_items();
+                subscriptionItem.setQuantity(rs.getInt("quantity"));
+                subscriptionItem.setAmount(rs.getInt("amount"));
+                subscription.setSubscriptionItems(subscriptionItem);
+
+                Items item = new Items();
+                item.setId(rs.getInt("item_id"));
+                item.setName(rs.getString("item_name"));
+                item.setPrice(rs.getInt("item_price"));
+                item.setType(rs.getString("item_type"));
+                subscriptionItem.setItemDetails(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subscription;
     }
 }

@@ -8,10 +8,12 @@ public class Subscriptions {
     private int total_due;
     private String activated_at;
     private String current_term_start;
-    private String getCurrent_term_end;
+    private String current_term_end;
     private String status;
+    private Subscription_items subscriptionItems;
+    private Customer customerDetails;
 
-    public Subscriptions(int id, int customer, int billing_period, String billing_period_unit, int total_due, String activated_at, String current_term_start, String getCurrent_term_end, String status) {
+    public Subscriptions(int id, int customer, int billing_period, String billing_period_unit, int total_due, String activated_at, String current_term_start, String current_term_end, String status) {
         this.id = id;
         this.customer = customer;
         this.billing_period = billing_period;
@@ -19,7 +21,7 @@ public class Subscriptions {
         this.total_due = total_due;
         this.activated_at = activated_at;
         this.current_term_start = current_term_start;
-        this.getCurrent_term_end = getCurrent_term_end;
+        this.current_term_end = current_term_end;
         this.status = status;
     }
 
@@ -83,12 +85,12 @@ public class Subscriptions {
         this.current_term_start = current_term_star;
     }
 
-    public String getGetCurrent_term_end() {
-        return getCurrent_term_end;
+    public String getCurrent_term_end() {
+        return current_term_end;
     }
 
-    public void setGetCurrent_term_end(String getCurrent_term_end) {
-        this.getCurrent_term_end = getCurrent_term_end;
+    public void setCurrent_term_end(String current_term_end) {
+        this.current_term_end = current_term_end;
     }
 
     public String getStatus() {
@@ -98,4 +100,24 @@ public class Subscriptions {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public Subscription_items getSubscriptionItems() {
+        return subscriptionItems;
+    }
+
+    public void setSubscriptionItems(Subscription_items subscriptionItems) {
+        this.subscriptionItems = subscriptionItems;
+    }
+
+    public void setCustomer(Customer customer) {
+    }
+
+    public Customer getCustomerDetails() {
+        return customerDetails;
+    }
+
+    public void setCustomerDetails(Customer customerDetails) {
+        this.customerDetails = customerDetails;
+    }
+
 }
