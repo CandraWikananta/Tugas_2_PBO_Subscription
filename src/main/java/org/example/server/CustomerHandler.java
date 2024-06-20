@@ -2,8 +2,8 @@ package org.example.server;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-import org.example.controller.CustomerController;
-import org.example.models.Customer;
+import org.example.controller.*;
+import org.example.models.*;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +13,7 @@ import java.util.List;
 public class CustomerHandler implements HttpHandler {
     private final String apiKey;
     private final CustomerController customerController = new CustomerController();
+    private final SubscriptionController subscriptionController = new SubscriptionController();
 
     public CustomerHandler(String apiKey) {
         this.apiKey = apiKey;
@@ -71,7 +72,23 @@ public class CustomerHandler implements HttpHandler {
                 os.write(response.getBytes());
                 os.close();
             }
-        } else {
+        } else if (pathComponents.length == 4 && "Subscriptions".equals(pathComponents[3])) { // Expecting /customers/{id}/subscriptions
+            try {
+                int customerId = Integer.parseInt(pathComponents[2]);
+                List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerId(customerId);
+                String json = new Gson().toJson(subscriptions);
+                t.sendResponseHeaders(200, json.length());
+                OutputStream os = t.getResponseBody();
+                os.write(json.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        }else {
             List<Customer> customers = customerController.getAllCustomers();
             String json = new Gson().toJson(customers);
             t.sendResponseHeaders(200, json.length());
@@ -117,6 +134,26 @@ public class CustomerHandler implements HttpHandler {
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
+        }
+    }
+
+    private void handleGetCustomerSubscriptionsRequest(HttpExchange t) throws IOException {
+        String path = t.getRequestURI().getPath();
+        String[] pathComponents = path.split("/");
+        if (pathComponents.length == 4) {
+            try {
+                int customerId = Integer.parseInt(pathComponents[2]);
+                List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerId(customerId);
+                String json = new Gson().toJson(subscriptions);
+                t.sendResponseHeaders(200, json.length());
+                OutputStream os = t.getResponseBody();
+                os.write(json.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                t.sendResponseHeaders(400, -1); // Bad Request
+            }
+        } else {
+            t.sendResponseHeaders(404, -1); // Not Found
         }
     }
 }

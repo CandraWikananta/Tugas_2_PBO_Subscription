@@ -13,6 +13,7 @@ public class Main {
             server.createContext("/Customer", new CustomerHandler(API_KEY));
             server.createContext("/Shipping_addresses", new ShippingAddressesHandler(API_KEY));
             server.createContext("/Subscriptions", new SubscriptionHandler(API_KEY));
+
             server.setExecutor(null); // creates a default executor
             server.start();
             System.out.println("Server Started on Port 9065");
