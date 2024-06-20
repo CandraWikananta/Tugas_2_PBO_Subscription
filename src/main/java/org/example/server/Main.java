@@ -1,17 +1,21 @@
 package org.example.server;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import com.sun.net.httpserver.HttpServer;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
+public class Main {
+    private static final String API_KEY = "cancan";
+    public static void main(String[] args)  {
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress("localhost",9065), 0);
+            server.createContext("/Customer", new CustomerHandler(API_KEY));
+            server.setExecutor(null); // creates a default executor
+            server.start();
+            System.out.println("Server Started on Port 9065");
+        } catch (IOException e){
+            System.out.println("Server failed to start: " + e.getMessage());
         }
     }
 }

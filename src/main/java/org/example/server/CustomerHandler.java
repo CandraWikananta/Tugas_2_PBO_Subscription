@@ -40,6 +40,8 @@ public class CustomerHandler implements HttpHandler {
         }
     }
 
+
+
     private void handleGetCustomerRequest(HttpExchange t) throws IOException {
         String path = t.getRequestURI().getPath();
         String[] pathComponents = path.split("/");
@@ -80,9 +82,9 @@ public class CustomerHandler implements HttpHandler {
     private void handlePostCustomerRequest(HttpExchange t) throws IOException {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Customer customer = new Gson().fromJson(isr, Customer.class);
-        boolean success = customerController.addCustomer(customer);
-        String response = success ? "Customer created successfully" : "Error creating customer";
-        t.sendResponseHeaders(success ? 201 : 500, response.length());
+        boolean success = customerController.postCustomer(customer);
+        String response = success ? "Error creating customer" : "Customer created successfully";
+        t.sendResponseHeaders(success ? 500 : 201, response.length());
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
         os.close();
