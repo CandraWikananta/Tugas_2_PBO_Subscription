@@ -35,6 +35,8 @@ public class CustomerHandler implements HttpHandler {
             handleGetCustomerRequest(t);
         } else if (method.equals("POST")) {
             handlePostCustomerRequest(t);
+        } else if (method.equals("DELETE")) {
+            handleDeleteRequest(t);
         } else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
@@ -88,5 +90,33 @@ public class CustomerHandler implements HttpHandler {
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
         os.close();
+    }
+
+    private void handleDeleteRequest(HttpExchange t) throws IOException {
+        String path = t.getRequestURI().getPath();
+        String[] pathComponents = path.split("/");
+        if (pathComponents.length == 3) {
+            try {
+                int id = Integer.parseInt(pathComponents[2]);
+                boolean isDeleted = customerController.deleteCustomer(id);
+                String response = isDeleted ? "Customer deleted successfully" : "Customer not found";
+                t.sendResponseHeaders(isDeleted ? 200 : 404, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else {
+            String response = "Bad request";
+            t.sendResponseHeaders(400, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
     }
 }
