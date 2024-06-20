@@ -10,8 +10,9 @@ public class Subscriptions {
     private String current_term_start;
     private String current_term_end;
     private String status;
-    private Subscription_items subscriptionItems;
+    private Subscription_items subscriptionItemsDetails;
     private Customer customerDetails;
+    private Items itemDetails;
 
     public Subscriptions(int id, int customer, int billing_period, String billing_period_unit, int total_due, String activated_at, String current_term_start, String current_term_end, String status) {
         this.id = id;
@@ -101,12 +102,12 @@ public class Subscriptions {
         this.status = status;
     }
 
-    public Subscription_items getSubscriptionItems() {
-        return subscriptionItems;
+    public Subscription_items getSubscriptionItemsDetails() {
+        return subscriptionItemsDetails;
     }
 
-    public void setSubscriptionItems(Subscription_items subscriptionItems) {
-        this.subscriptionItems = subscriptionItems;
+    public void setSubscriptionItemsDetails(Subscription_items subscriptionItems) {
+        this.subscriptionItemsDetails = subscriptionItems;
     }
 
     public void setCustomer(Customer customer) {
@@ -120,4 +121,11 @@ public class Subscriptions {
         this.customerDetails = customerDetails;
     }
 
+    public Items getItemDetails() {
+        return itemDetails;
+    }
+
+    public void setItemDetails(Items itemDetails) {
+        this.itemDetails = itemDetails;
+    }
 }

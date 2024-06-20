@@ -121,7 +121,7 @@ public class SubscriptionController {
         Subscriptions subscription = null;
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "SELECT s.*, c.id as customer_id, c.first_name, c.last_name, c.email, c.phone_number, " +
-                    "si.quantity, si.amount, i.id as item_id, i.name as item_name, i.price as item_price, i.type as item_type " +
+                    "si.quantity, si.amount, si.price, si.item, si.subscription, i.id as item_id, i.name as item_name, i.price as item_price, i.type as item_type, i.is_active " +
                     "FROM Subscriptions s " +
                     "JOIN Customer c ON s.customer = c.id " +
                     "JOIN Subscription_items si ON s.id = si.subscription " +
@@ -152,16 +152,20 @@ public class SubscriptionController {
                 }
 
                 Subscription_items subscriptionItem = new Subscription_items();
+                 subscriptionItem.setSubscription(rs.getInt("subscription"));
+                 subscriptionItem.setItem(rs.getInt("item"));
                 subscriptionItem.setQuantity(rs.getInt("quantity"));
+                 subscriptionItem.setPrice(rs.getInt("price"));
                 subscriptionItem.setAmount(rs.getInt("amount"));
-                subscription.setSubscriptionItems(subscriptionItem);
+                subscription.setSubscriptionItemsDetails(subscriptionItem);
 
                 Items item = new Items();
                 item.setId(rs.getInt("item_id"));
                 item.setName(rs.getString("item_name"));
                 item.setPrice(rs.getInt("item_price"));
                 item.setType(rs.getString("item_type"));
-                subscriptionItem.setItemDetails(item);
+                item.setIs_active(rs.getInt("is_active"));
+                subscription.setItemDetails(item);
             }
         } catch (SQLException e) {
             e.printStackTrace();
