@@ -1,6 +1,6 @@
 package org.example.models;
 
-public class cards {
+public class Cards {
     private int id;
     private int customer;
     private String card_type;
@@ -10,7 +10,7 @@ public class cards {
     private String status;
     private int is_primary;
 
-    public cards(int id, int customer, String card_type, String masked_number, int expiry_month, int expiry_year, String status, int is_primary) {
+    public Cards(int id, int customer, String card_type, String masked_number, int expiry_month, int expiry_year, String status, int is_primary) {
         this.id = id;
         this.customer = customer;
         this.card_type = card_type;
@@ -19,6 +19,10 @@ public class cards {
         this.expiry_year = expiry_year;
         this.status = status;
         this.is_primary = is_primary;
+    }
+
+    public Cards(){
+
     }
 
     public int getId() {

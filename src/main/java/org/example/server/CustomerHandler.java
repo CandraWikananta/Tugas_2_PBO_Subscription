@@ -15,10 +15,13 @@ public class CustomerHandler implements HttpHandler {
     private final CustomerController customerController = new CustomerController();
     private final SubscriptionController subscriptionController = new SubscriptionController();
 
+    private final CardsController cardsController = new CardsController();
+
     public CustomerHandler(String apiKey) {
         this.apiKey = apiKey;
     }
 
+    // Mengecek API-Key jika sesuai dengan API-Key pada Main.Java
     @Override
     public void handle(HttpExchange t) throws IOException {
         if (!t.getRequestHeaders().containsKey("API-Key") || !t.getRequestHeaders().getFirst("API-Key").equals(apiKey)) {
@@ -30,6 +33,7 @@ public class CustomerHandler implements HttpHandler {
             return;
         }
 
+        // Mengecek Metode yang digunakan (GET, POST, DELETE, PUT)
         String method = t.getRequestMethod();
         String path = t.getRequestURI().getPath();
         if (method.equals("GET")) {
@@ -43,12 +47,11 @@ public class CustomerHandler implements HttpHandler {
         }
     }
 
-
-
     private void handleGetCustomerRequest(HttpExchange t) throws IOException {
         String path = t.getRequestURI().getPath();
         String[] pathComponents = path.split("/");
-        if (pathComponents.length == 3) { // Expecting /Customer/{id}
+        String query = t.getRequestURI().getQuery();
+        if (pathComponents.length == 3) { // jika GET/Customer/{id}
             try {
                 int id = Integer.parseInt(pathComponents[2]);
                 Customer customer = customerController.getCustomerById(id);
@@ -72,11 +75,37 @@ public class CustomerHandler implements HttpHandler {
                 os.write(response.getBytes());
                 os.close();
             }
-        } else if (pathComponents.length == 4 && "Subscriptions".equals(pathComponents[3])) { // Expecting /customers/{id}/subscriptions
+        } else if (pathComponents.length == 4 && "Subscriptions".equals(pathComponents[3])) { // jika GET/customers/{id}/subscriptions
             try {
                 int customerId = Integer.parseInt(pathComponents[2]);
-                List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerId(customerId);
-                String json = new Gson().toJson(subscriptions);
+                if (query != null && query.startsWith("subscriptions_status=")) {
+                    String status = query.split("=")[1];
+                    List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerIdAndStatus(customerId, status);
+                    String json = new Gson().toJson(subscriptions);
+                    t.sendResponseHeaders(200, json.length());
+                    OutputStream os = t.getResponseBody();
+                    os.write(json.getBytes());
+                    os.close();
+                } else {
+                    List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerId(customerId);
+                    String json = new Gson().toJson(subscriptions);
+                    t.sendResponseHeaders(200, json.length());
+                    OutputStream os = t.getResponseBody();
+                    os.write(json.getBytes());
+                    os.close();
+                }
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else if (pathComponents.length == 4 && "Cards".equals(pathComponents[3])) { // Expecting /customers/{id}/cards
+            try {
+                int customerId = Integer.parseInt(pathComponents[2]);
+                List<Cards> cards = cardsController.getCardsByCustomerId(customerId);
+                String json = new Gson().toJson(cards);
                 t.sendResponseHeaders(200, json.length());
                 OutputStream os = t.getResponseBody();
                 os.write(json.getBytes());
@@ -88,7 +117,7 @@ public class CustomerHandler implements HttpHandler {
                 os.write(response.getBytes());
                 os.close();
             }
-        }else {
+        }else { // jika GET/Customers akan mengambil semua Customers
             List<Customer> customers = customerController.getAllCustomers();
             String json = new Gson().toJson(customers);
             t.sendResponseHeaders(200, json.length());
@@ -98,6 +127,7 @@ public class CustomerHandler implements HttpHandler {
         }
     }
 
+    // POST/Customer
     private void handlePostCustomerRequest(HttpExchange t) throws IOException {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Customer customer = new Gson().fromJson(isr, Customer.class);
@@ -109,6 +139,7 @@ public class CustomerHandler implements HttpHandler {
         os.close();
     }
 
+    // DELETE/Customer/{id}
     private void handleDeleteRequest(HttpExchange t) throws IOException {
         String path = t.getRequestURI().getPath();
         String[] pathComponents = path.split("/");
@@ -134,26 +165,6 @@ public class CustomerHandler implements HttpHandler {
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
             os.close();
-        }
-    }
-
-    private void handleGetCustomerSubscriptionsRequest(HttpExchange t) throws IOException {
-        String path = t.getRequestURI().getPath();
-        String[] pathComponents = path.split("/");
-        if (pathComponents.length == 4) {
-            try {
-                int customerId = Integer.parseInt(pathComponents[2]);
-                List<Subscriptions> subscriptions = subscriptionController.getSubscriptionsByCustomerId(customerId);
-                String json = new Gson().toJson(subscriptions);
-                t.sendResponseHeaders(200, json.length());
-                OutputStream os = t.getResponseBody();
-                os.write(json.getBytes());
-                os.close();
-            } catch (NumberFormatException e) {
-                t.sendResponseHeaders(400, -1); // Bad Request
-            }
-        } else {
-            t.sendResponseHeaders(404, -1); // Not Found
         }
     }
 }

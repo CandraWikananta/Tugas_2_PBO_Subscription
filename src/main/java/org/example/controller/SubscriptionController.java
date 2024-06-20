@@ -89,4 +89,31 @@ public class SubscriptionController {
         }
         return subscriptions;
     }
+
+    public List<Subscriptions> getSubscriptionsByCustomerIdAndStatus(int customerId, String status) {
+        List<Subscriptions> subscriptions = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM Subscriptions WHERE customer = ? AND status = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, customerId);
+            pstmt.setString(2, status);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Subscriptions subs = new Subscriptions();
+                subs.setId(rs.getInt("id"));
+                subs.setCustomer(rs.getInt("customer"));
+                subs.setBilling_period(rs.getInt("billing_period"));
+                subs.setBilling_period_unit(rs.getString("billing_period_unit"));
+                subs.setTotal_due(rs.getInt("total_due"));
+                subs.setActivated_at(rs.getString("activated_at"));
+                subs.setCurrent_term_start(rs.getString("current_term_start"));
+                subs.setGetCurrent_term_end(rs.getString("current_term_end"));
+                subs.setStatus(rs.getString("status"));
+                subscriptions.add(subs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return subscriptions;
+    }
 }
