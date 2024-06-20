@@ -3,6 +3,7 @@ package org.example.server;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import org.example.controller.SubscriptionController;
+import org.example.models.Customer;
 import org.example.models.Subscriptions;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -27,11 +28,12 @@ public class SubscriptionHandler implements HttpHandler{
             os.close();
             return;
         }
-
         String method = t.getRequestMethod();
         String path = t.getRequestURI().getPath();
         if (method.equals("GET")) {
             handleGetSubscriptionRequest(t);
+        } else if (method.equals("POST")) {
+            handlePostSubscriptionRequest(t);
         } else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
@@ -46,6 +48,16 @@ public class SubscriptionHandler implements HttpHandler{
         OutputStream os = t.getResponseBody();
         os.write(json.getBytes());
         os.close();
+    }
 
+    private void handlePostSubscriptionRequest(HttpExchange t) throws IOException {
+        InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
+        Subscriptions subscriptions = new Gson().fromJson(isr, Subscriptions.class);
+        boolean success = subscriptionController.postSubscriptions(subscriptions);
+        String response = success ? "Error creating Subscription" : "Subscription created successfully";
+        t.sendResponseHeaders(success ? 500 : 201, response.length());
+        OutputStream os = t.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
     }
 }

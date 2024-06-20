@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.models.Customer;
 import org.example.models.Subscriptions;
 import org.example.server.DatabaseConnection;
 
@@ -30,6 +31,35 @@ public class SubscriptionController {
             e.printStackTrace();
         }
         return subscriptions;
+    }
+
+    public boolean postSubscriptions(Subscriptions subscriptions) {
+        String response;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "INSERT INTO Subscriptions (id, customer, billing_period, billing_period_unit, total_due, activated_at, current_term_start, current_term_end, status)VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, subscriptions.getId());
+            pstmt.setInt(2, subscriptions.getCustomer());
+            pstmt.setInt(3, subscriptions.getBilling_period());
+            pstmt.setString(4, subscriptions.getBilling_period_unit());
+            pstmt.setInt(5, subscriptions.getTotal_due());
+            pstmt.setString(6, subscriptions.getActivated_at());
+            pstmt.setString(7, subscriptions.getCurrent_term_start());
+            pstmt.setString(8, subscriptions.getGetCurrent_term_end());
+            pstmt.setString(9, subscriptions.getStatus());
+            int rowsInserted = pstmt.executeUpdate();
+            if(rowsInserted > 0){
+                response = rowsInserted + "row(s) has been inserted";
+                System.out.println(response);
+            }else{
+                response = "no rows have been inserted";
+                System.out.println(response);
+            }
+//            return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public Subscriptions getSubscriptionById(int id) {
