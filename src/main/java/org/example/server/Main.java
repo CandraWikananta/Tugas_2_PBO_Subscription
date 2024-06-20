@@ -14,6 +14,7 @@ public class Main {
             server.createContext("/Shipping_addresses", new ShippingAddressesHandler(API_KEY));
             server.createContext("/Subscriptions", new SubscriptionHandler(API_KEY));
             server.createContext("/Cards", new CardsHandler(API_KEY));
+            server.createContext("/Items", new ItemsHandler(API_KEY));
 
             server.setExecutor(null); // creates a default executor
             server.start();

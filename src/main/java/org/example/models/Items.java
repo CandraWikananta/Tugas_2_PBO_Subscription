@@ -1,19 +1,21 @@
 package org.example.models;
 
-public class items {
+public class Items {
     private int id;
     private String name;
     private int price;
     private String type;
     private int is_active;
 
-    public items(int id, String name, int price, String type, int is_active) {
+    public Items(int id, String name, int price, String type, int is_active) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.type = type;
         this.is_active = is_active;
     }
+
+    public Items(){}
 
     public int getId() {
         return id;
