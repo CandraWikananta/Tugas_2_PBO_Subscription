@@ -42,39 +42,49 @@ public class ItemsHandler implements HttpHandler {
     }
 
     private void handleGetItemsRequest(HttpExchange t) throws IOException {
-        String path = t.getRequestURI().getPath();
-        String[] pathComponents = path.split("/");
-        if (pathComponents.length == 3) { // Expecting /Items/{id}
-            try {
-                int id = Integer.parseInt(pathComponents[2]);
-                Items items = itemsController.getItemsById(id);
-                if (items != null) {
-                    String json = new Gson().toJson(items);
-                    t.sendResponseHeaders(200, json.length());
-                    OutputStream os = t.getResponseBody();
-                    os.write(json.getBytes());
-                    os.close();
-                } else {
-                    String response = "Items not found";
-                    t.sendResponseHeaders(404, response.length());
-                    OutputStream os = t.getResponseBody();
-                    os.write(response.getBytes());
-                    os.close();
-                }
-            } catch (NumberFormatException e) {
-                String response = "Invalid ID format";
-                t.sendResponseHeaders(400, response.length());
-                OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-            }
-        } else {
-            List<Items> items = itemsController.getAllItems();
+        String query = t.getRequestURI().getQuery();
+        if (query != null && query.contains("is_active=true")) {
+            List<Items> items = itemsController.getActiveItems();
             String json = new Gson().toJson(items);
             t.sendResponseHeaders(200, json.length());
             OutputStream os = t.getResponseBody();
             os.write(json.getBytes());
             os.close();
+        } else {
+            String path = t.getRequestURI().getPath();
+            String[] pathComponents = path.split("/");
+            if (pathComponents.length == 3) { // Expecting /Items/{id}
+                try {
+                    int id = Integer.parseInt(pathComponents[2]);
+                    Items items = itemsController.getItemsById(id);
+                    if (items != null) {
+                        String json = new Gson().toJson(items);
+                        t.sendResponseHeaders(200, json.length());
+                        OutputStream os = t.getResponseBody();
+                        os.write(json.getBytes());
+                        os.close();
+                    } else {
+                        String response = "Item dengan id "+ id + " tidak dapat ditemukan";
+                        t.sendResponseHeaders(404, response.length());
+                        OutputStream os = t.getResponseBody();
+                        os.write(response.getBytes());
+                        os.close();
+                    }
+                } catch (NumberFormatException e) {
+                    String response = "Invalid ID format";
+                    t.sendResponseHeaders(400, response.length());
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
+            } else {
+                List<Items> items = itemsController.getAllItems();
+                String json = new Gson().toJson(items);
+                t.sendResponseHeaders(200, json.length());
+                OutputStream os = t.getResponseBody();
+                os.write(json.getBytes());
+                os.close();
+            }
         }
     }
 
@@ -82,7 +92,7 @@ public class ItemsHandler implements HttpHandler {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Items items = new Gson().fromJson(isr, Items.class);
         boolean success = itemsController.postItems(items);
-        String response = success ? "Items created successfully" : "Error creating items";
+        String response = success ? "Item berhasil ditambahkan" : "Error menambahkan Item";
         t.sendResponseHeaders(success ? 201 : 500, response.length());
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
@@ -96,7 +106,7 @@ public class ItemsHandler implements HttpHandler {
             try {
                 int id = Integer.parseInt(pathComponents[2]);
                 boolean isDeleted = itemsController.deleteItems(id);
-                String response = isDeleted ? "Items deleted successfully" : "Items not found";
+                String response = isDeleted ? "Item berhasil di delete" : "Item tidak dapat ditemukan";
                 t.sendResponseHeaders(isDeleted ? 200 : 404, response.length());
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());

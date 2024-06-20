@@ -56,7 +56,7 @@ public class SubscriptionHandler implements HttpHandler {
                     os.write(json.getBytes());
                     os.close();
                 } else {
-                    String response = "Subscription not found";
+                    String response = "Subscription dengan id "+ id +" tidak dapat ditemukan";
                     t.sendResponseHeaders(404, response.length());
                     OutputStream os = t.getResponseBody();
                     os.write(response.getBytes());
@@ -91,7 +91,7 @@ public class SubscriptionHandler implements HttpHandler {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Subscriptions subscriptions = new Gson().fromJson(isr, Subscriptions.class);
         boolean success = subscriptionController.postSubscriptions(subscriptions);
-        String response = success ? "Error creating Subscription" : "Subscription created successfully";
+        String response = success ? "Error menambahkan Subscription" : "Subscription berhasil ditambahkan";
         t.sendResponseHeaders(success ? 500 : 201, response.length());
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
@@ -111,15 +111,4 @@ public class SubscriptionHandler implements HttpHandler {
         }
         return result;
     }
-
-//    private Map<String, String> queryToMap(String query) {
-//        if (query == null) return Map.of();
-//        return Arrays.stream(query.split("&"))
-//                .map(param -> param.split("="))
-//                .collect(Collectors.toMap(
-//                        pair -> pair[0],
-//                        pair -> pair.length > 1 ? pair[1] : ""));
-//    }
-
-
 }

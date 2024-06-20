@@ -29,24 +29,6 @@ public class ItemsController {
         return items;
     }
 
-
-    public boolean addItems(Items items) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "INSERT INTO Items (id, name, price, type, is_active) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, items.getId());
-            pstmt.setString(2, items.getName());
-            pstmt.setInt(3, items.getPrice());
-            pstmt.setString(4, items.getType());
-            pstmt.setInt(5, items.getIs_active());
-            int rowsInserted = pstmt.executeUpdate();
-            return rowsInserted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public Items getItemsById(int id) {
         Items items = null;
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -95,5 +77,26 @@ public class ItemsController {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Items> getActiveItems() {
+        List<Items> items = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM Items WHERE is_active = 1";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                Items item = new Items();
+                item.setId(rs.getInt("id"));
+                item.setName(rs.getString("name"));
+                item.setPrice(rs.getInt("price"));
+                item.setType(rs.getString("type"));
+                item.setIs_active(rs.getInt("is_active"));
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return items;
     }
 }

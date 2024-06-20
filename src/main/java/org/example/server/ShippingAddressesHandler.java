@@ -51,7 +51,7 @@ public class ShippingAddressesHandler implements HttpHandler {
                     os.write(json.getBytes());
                     os.close();
                 } else {
-                    String response = "Shipping Address not found";
+                    String response = "Shipping Address dengan id " + id + " tidak dapat ditemukan";
                     t.sendResponseHeaders(404, response.length());
                     OutputStream os = t.getResponseBody();
                     os.write(response.getBytes());

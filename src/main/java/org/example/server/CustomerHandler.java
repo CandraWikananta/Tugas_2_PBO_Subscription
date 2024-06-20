@@ -62,7 +62,7 @@ public class CustomerHandler implements HttpHandler {
                     os.write(json.getBytes());
                     os.close();
                 } else {
-                    String response = "Customer not found";
+                    String response = "Customer dengan id " + id + " tidak dapat ditemukan";
                     t.sendResponseHeaders(404, response.length());
                     OutputStream os = t.getResponseBody();
                     os.write(response.getBytes());
@@ -132,7 +132,7 @@ public class CustomerHandler implements HttpHandler {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Customer customer = new Gson().fromJson(isr, Customer.class);
         boolean success = customerController.postCustomer(customer);
-        String response = success ? "Error creating customer" : "Customer created successfully";
+        String response = success ? "Error menambahkan Customer" : "Customer berhasil ditambahkan";
         t.sendResponseHeaders(success ? 500 : 201, response.length());
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
@@ -147,7 +147,7 @@ public class CustomerHandler implements HttpHandler {
             try {
                 int id = Integer.parseInt(pathComponents[2]);
                 boolean isDeleted = customerController.deleteCustomer(id);
-                String response = isDeleted ? "Customer deleted successfully" : "Customer not found";
+                String response = isDeleted ? "Customer berhasil di delete" : "Customer tidak dapat ditemukan";
                 t.sendResponseHeaders(isDeleted ? 200 : 404, response.length());
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
