@@ -7,20 +7,24 @@ public class Subscriptions {
     private String billing_period_unit;
     private int total_due;
     private String activated_at;
-    private String current_term_star;
+    private String current_term_start;
     private String getCurrent_term_end;
     private String status;
 
-    public Subscriptions(int id, int customer, int billing_period, String billing_period_unit, int total_due, String activated_at, String current_term_star, String getCurrent_term_end, String status) {
+    public Subscriptions(int id, int customer, int billing_period, String billing_period_unit, int total_due, String activated_at, String current_term_start, String getCurrent_term_end, String status) {
         this.id = id;
         this.customer = customer;
         this.billing_period = billing_period;
         this.billing_period_unit = billing_period_unit;
         this.total_due = total_due;
         this.activated_at = activated_at;
-        this.current_term_star = current_term_star;
+        this.current_term_start = current_term_start;
         this.getCurrent_term_end = getCurrent_term_end;
         this.status = status;
+    }
+
+    public Subscriptions() {
+
     }
 
     public int getId() {
@@ -71,12 +75,12 @@ public class Subscriptions {
         this.activated_at = activated_at;
     }
 
-    public String getCurrent_term_star() {
-        return current_term_star;
+    public String getCurrent_term_start() {
+        return current_term_start;
     }
 
-    public void setCurrent_term_star(String current_term_star) {
-        this.current_term_star = current_term_star;
+    public void setCurrent_term_start(String current_term_star) {
+        this.current_term_start = current_term_star;
     }
 
     public String getGetCurrent_term_end() {

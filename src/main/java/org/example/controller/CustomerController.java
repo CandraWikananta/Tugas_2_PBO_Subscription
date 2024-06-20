@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.models.Customer;
+import org.example.models.Shipping_addresses;
 import org.example.server.DatabaseConnection;
 
 import java.sql.*;
@@ -70,7 +71,7 @@ public class CustomerController {
                 customer.setLast_name(rs.getString("last_name"));
                 customer.setEmail(rs.getString("email"));
                 customer.setPhone_number(rs.getString("phone_number"));
-                customer.setShippingAddressesLine1(rs.getString("line1"));
+                customer.setShippingAddresses(getShippingAddressesByCustomerId(id));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -113,5 +114,30 @@ public class CustomerController {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private List<Shipping_addresses> getShippingAddressesByCustomerId(int customerId) {
+        List<Shipping_addresses> addresses = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM Shipping_addresses WHERE customer = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, customerId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Shipping_addresses address = new Shipping_addresses();
+                address.setId(rs.getInt("id"));
+                address.setCustomer(rs.getInt("customer"));
+                address.setTitle(rs.getString("title"));
+                address.setLine1(rs.getString("line1"));
+                address.setLine2(rs.getString("line2"));
+                address.setCity(rs.getString("city"));
+                address.setProvince(rs.getString("province"));
+                address.setPostcode(rs.getString("postcode"));
+                addresses.add(address);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return addresses;
     }
 }

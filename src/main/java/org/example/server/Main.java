@@ -11,6 +11,8 @@ public class Main {
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress("localhost",9065), 0);
             server.createContext("/Customer", new CustomerHandler(API_KEY));
+            server.createContext("/Shipping_addresses", new ShippingAddressesHandler(API_KEY));
+            server.createContext("/Subscriptions", new SubscriptionHandler(API_KEY));
             server.setExecutor(null); // creates a default executor
             server.start();
             System.out.println("Server Started on Port 9065");
