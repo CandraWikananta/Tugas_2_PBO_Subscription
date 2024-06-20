@@ -90,6 +90,23 @@ public class CustomerController {
         return false;
     }
 
+    public boolean updateCustomer(int id, Customer customer) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "UPDATE Customer SET email = ?, first_name = ?, last_name = ?, phone_number = ? WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, customer.getEmail());
+            pstmt.setString(2, customer.getFirst_name());
+            pstmt.setString(3, customer.getLast_name());
+            pstmt.setString(4, customer.getPhone_number());
+            pstmt.setInt(5, id);
+            int rowsUpdated = pstmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private List<Shipping_addresses> getShippingAddressesByCustomerId(int customerId) {
         List<Shipping_addresses> addresses = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection()) {

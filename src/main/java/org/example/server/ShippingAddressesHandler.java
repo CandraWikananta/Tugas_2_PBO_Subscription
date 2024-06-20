@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.example.controller.ShippingAddressesController;
 import org.example.models.Shipping_addresses;
 import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -29,10 +30,11 @@ public class ShippingAddressesHandler implements HttpHandler {
         }
 
         String method = t.getRequestMethod();
-        String path = t.getRequestURI().getPath();
         if (method.equals("GET")) {
             handleGetShippingAddressRequest(t);
-        } else {
+        } else if (method.equals("PUT")) {
+            handlePutShippingAddressRequest(t);
+        }else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
     }
@@ -70,6 +72,36 @@ public class ShippingAddressesHandler implements HttpHandler {
             t.sendResponseHeaders(200, json.length());
             OutputStream os = t.getResponseBody();
             os.write(json.getBytes());
+            os.close();
+        }
+    }
+
+    private void handlePutShippingAddressRequest(HttpExchange t) throws IOException{
+        String path = t.getRequestURI().getPath();
+        String[] pathComponents = path.split("/");
+        if (pathComponents.length == 3) {
+            try {
+                int id = Integer.parseInt(pathComponents[2]);
+                InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
+                Shipping_addresses shipAdd = new Gson().fromJson(isr, Shipping_addresses.class);
+                boolean success = shippingAddressController.updateShippingAddressById(id, shipAdd);
+                String response = success ? "Item berhasil diperbarui" : "Item tidak ditemukan atau gagal diperbarui";
+                t.sendResponseHeaders(success ? 200 : 404, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else {
+            String response = "Bad request";
+            t.sendResponseHeaders(400, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
             os.close();
         }
     }

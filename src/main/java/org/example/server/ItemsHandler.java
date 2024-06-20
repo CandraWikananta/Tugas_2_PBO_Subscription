@@ -36,6 +36,8 @@ public class ItemsHandler implements HttpHandler {
             handlePostItemsRequest(t);
         } else if (method.equals("DELETE")) {
             handleDeleteRequest(t);
+        } else if (method.equals("PUT")) {
+            handlePutItemsRequest(t);
         } else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
@@ -108,6 +110,36 @@ public class ItemsHandler implements HttpHandler {
                 boolean isDeleted = itemsController.deleteItems(id);
                 String response = isDeleted ? "Item berhasil di delete" : "Item tidak dapat ditemukan";
                 t.sendResponseHeaders(isDeleted ? 200 : 404, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else {
+            String response = "Bad request";
+            t.sendResponseHeaders(400, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+
+    private void handlePutItemsRequest(HttpExchange t) throws IOException {
+        String path = t.getRequestURI().getPath();
+        String[] pathComponents = path.split("/");
+        if (pathComponents.length == 3) {
+            try {
+                int id = Integer.parseInt(pathComponents[2]);
+                InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
+                Items item = new Gson().fromJson(isr, Items.class);
+                boolean success = itemsController.updateItems(id, item);
+                String response = success ? "Item berhasil diperbarui" : "Item tidak ditemukan atau gagal diperbarui";
+                t.sendResponseHeaders(success ? 200 : 404, response.length());
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();

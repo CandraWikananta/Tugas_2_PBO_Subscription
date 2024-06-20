@@ -14,7 +14,7 @@ public class CustomerHandler implements HttpHandler {
     private final String apiKey;
     private final CustomerController customerController = new CustomerController();
     private final SubscriptionController subscriptionController = new SubscriptionController();
-
+    private final ShippingAddressesController shippingAddressesController = new ShippingAddressesController();
     private final CardsController cardsController = new CardsController();
 
     public CustomerHandler(String apiKey) {
@@ -42,6 +42,8 @@ public class CustomerHandler implements HttpHandler {
             handlePostCustomerRequest(t);
         } else if (method.equals("DELETE")) {
             handleDeleteRequest(t);
+        } else if (method.equals("PUT")) {
+            handlePutCustomerRequest(t);
         } else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
@@ -186,6 +188,55 @@ public class CustomerHandler implements HttpHandler {
                 boolean isDeleted = customerController.deleteCustomer(id);
                 String response = isDeleted ? "Customer berhasil di delete" : "Customer tidak dapat ditemukan";
                 t.sendResponseHeaders(isDeleted ? 200 : 404, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else {
+            String response = "Bad request";
+            t.sendResponseHeaders(400, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        }
+    }
+
+    private void handlePutCustomerRequest(HttpExchange t) throws IOException {
+        String path = t.getRequestURI().getPath();
+        String[] pathComponents = path.split("/");
+        if (pathComponents.length == 5 && "Shipping_addresses".equals((pathComponents[3]))){
+            try {
+                int customerId = Integer.parseInt(pathComponents[2]);
+                int addressId = Integer.parseInt(pathComponents[4]);
+                InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
+                Shipping_addresses address = new Gson().fromJson(isr, Shipping_addresses.class);
+                boolean success = shippingAddressesController.updateShippingAddressById(addressId, address);
+                String response = success ? "Alamat pengiriman berhasil diperbarui" : "Alamat pengiriman tidak ditemukan atau gagal diperbarui";
+                t.sendResponseHeaders(success ? 200 : 404, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else if (pathComponents.length == 3) {
+            try {
+                int id = Integer.parseInt(pathComponents[2]);
+                InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
+                Customer customer = new Gson().fromJson(isr, Customer.class);
+                boolean success = customerController.updateCustomer(id, customer);
+                String response = success ? "Customer berhasil diperbarui" : "Customer tidak ditemukan atau gagal diperbarui";
+                t.sendResponseHeaders(success ? 200 : 404, response.length());
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();

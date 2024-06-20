@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Main {
-    private static final String API_KEY = "cancan";
+    private static final String API_KEY = "API-Subscription-Key";
     public static void main(String[] args)  {
         try {
             HttpServer server = HttpServer.create(new InetSocketAddress("localhost",9065), 0);

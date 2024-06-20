@@ -79,6 +79,23 @@ public class ItemsController {
         return false;
     }
 
+    public boolean updateItems(int id, Items items) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "UPDATE Items SET name = ?, price = ?, type = ?, is_active = ? WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, items.getName());
+            pstmt.setInt(2, items.getPrice());
+            pstmt.setString(3, items.getType());
+            pstmt.setInt(4, items.getIs_active());
+            pstmt.setInt(5, id);
+            int rowsUpdated = pstmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public List<Items> getActiveItems() {
         List<Items> items = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection()) {

@@ -5,19 +5,14 @@ import com.sun.net.httpserver.HttpExchange;
 import org.example.controller.CardsController;
 import org.example.models.Cards;
 import com.google.gson.Gson;
-import org.example.models.Subscriptions;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 public class CardsHandler implements HttpHandler{
     private final String apiKey;
-
     private final CardsController cardsController = new CardsController();
-
     public CardsHandler(String apiKey) {
         this.apiKey = apiKey;
     }
@@ -48,10 +43,7 @@ public class CardsHandler implements HttpHandler{
         if (pathComponents.length == 3) {
             try {
                 int cardId = Integer.parseInt(pathComponents[2]);
-
-                // Mendapatkan informasi kartu berdasarkan cardId
                 Cards card = cardsController.getCardById(cardId);
-
                 if (card != null) {
                     String json = new Gson().toJson(card);
                     t.sendResponseHeaders(200, json.length());
@@ -80,7 +72,6 @@ public class CardsHandler implements HttpHandler{
             os.write(json.getBytes());
             os.close();
         } else {
-            // Jika pathComponents.length tidak sesuai dengan format yang diharapkan
             String response = "Bad request";
             t.sendResponseHeaders(400, response.length());
             OutputStream os = t.getResponseBody();

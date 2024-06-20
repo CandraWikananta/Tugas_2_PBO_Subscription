@@ -8,10 +8,8 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class SubscriptionHandler implements HttpHandler {
     private final String apiKey;

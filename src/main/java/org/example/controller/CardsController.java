@@ -81,7 +81,6 @@ public class CardsController {
         return card;
     }
 
-
     public boolean deleteCard(int cardId) {
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "DELETE FROM Cards WHERE id = ?";

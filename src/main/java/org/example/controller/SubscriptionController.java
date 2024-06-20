@@ -57,7 +57,6 @@ public class SubscriptionController {
                 response = "no rows have been inserted";
                 System.out.println(response);
             }
-//            return rowsInserted > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -152,10 +151,10 @@ public class SubscriptionController {
                 }
 
                 Subscription_items subscriptionItem = new Subscription_items();
-                 subscriptionItem.setSubscription(rs.getInt("subscription"));
-                 subscriptionItem.setItem(rs.getInt("item"));
+                subscriptionItem.setSubscription(rs.getInt("subscription"));
+                subscriptionItem.setItem(rs.getInt("item"));
                 subscriptionItem.setQuantity(rs.getInt("quantity"));
-                 subscriptionItem.setPrice(rs.getInt("price"));
+                subscriptionItem.setPrice(rs.getInt("price"));
                 subscriptionItem.setAmount(rs.getInt("amount"));
                 subscription.setSubscriptionItemsDetails(subscriptionItem);
 
