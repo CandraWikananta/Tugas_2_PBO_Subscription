@@ -29,31 +29,6 @@ public class CustomerController {
         return customers;
     }
 
-    public boolean addCustomer(Customer customer) {
-        String response;
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "INSERT INTO Customer (id, email, first_name, last_name, phone_number)VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, customer.getId());
-            pstmt.setString(2, customer.getEmail());
-            pstmt.setString(3, customer.getFirst_name());
-            pstmt.setString(4, customer.getLast_name());
-            pstmt.setString(5, customer.getPhone_number());
-            int rowsInserted = pstmt.executeUpdate();
-            if(rowsInserted > 0){
-                response = rowsInserted + "row(s) has been inserted";
-                System.out.println(response);
-            }else{
-                response = "no rows have been inserted";
-                System.out.println(response);
-            }
-//            return rowsInserted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public Customer getCustomerById(int id) {
         Customer customer = null;
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -109,7 +84,6 @@ public class CustomerController {
                 response = "no rows have been inserted";
                 System.out.println(response);
             }
-//            return rowsInserted > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }

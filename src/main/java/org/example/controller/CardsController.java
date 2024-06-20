@@ -56,4 +56,42 @@ public class CardsController {
         }
         return cards;
     }
+
+    public Cards getCardById(int cardId) {
+        Cards card = null;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM Cards WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, cardId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                card = new Cards();
+                card.setId(rs.getInt("id"));
+                card.setCustomer(rs.getInt("customer"));
+                card.setCard_type(rs.getString("card_type"));
+                card.setMasked_number(rs.getString("masked_number"));
+                card.setExpiry_month(rs.getInt("expiry_month"));
+                card.setExpiry_year(rs.getInt("expiry_year"));
+                card.setStatus(rs.getString("status"));
+                card.setIs_primary(rs.getInt("is_primary"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return card;
+    }
+
+
+    public boolean deleteCard(int cardId) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "DELETE FROM Cards WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, cardId);
+            int rowsDeleted = pstmt.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -143,7 +143,44 @@ public class CustomerHandler implements HttpHandler {
     private void handleDeleteRequest(HttpExchange t) throws IOException {
         String path = t.getRequestURI().getPath();
         String[] pathComponents = path.split("/");
-        if (pathComponents.length == 3) {
+        if(pathComponents.length == 5){
+            try {
+                int customerId = Integer.parseInt(pathComponents[2]);
+                int cardId = Integer.parseInt(pathComponents[4]);
+
+                // Memeriksa apakah kartu dimiliki oleh customer yang dimaksud
+                Cards card = cardsController.getCardById(cardId);
+                if (card != null && card.getCustomer() == customerId) {
+                    // Memeriksa apakah kartu dapat dihapus
+                    if (card.getIs_primary() == 0) {
+                        boolean isDeleted = cardsController.deleteCard(cardId);
+                        String response = isDeleted ? "Card berhasil dihapus" : "Card tidak dapat dihapus";
+                        t.sendResponseHeaders(isDeleted ? 200 : 500, response.length());
+                        OutputStream os = t.getResponseBody();
+                        os.write(response.getBytes());
+                        os.close();
+                    } else {
+                        String response = "Card dengan ID " + cardId + " adalah kartu utama";
+                        t.sendResponseHeaders(403, response.length()); // Forbidden
+                        OutputStream os = t.getResponseBody();
+                        os.write(response.getBytes());
+                        os.close();
+                    }
+                } else {
+                    String response = "Card dengan ID " + cardId + " tidak ditemukan untuk customer " + customerId;
+                    t.sendResponseHeaders(404, response.length()); // Not Found
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
+            } catch (NumberFormatException e) {
+                String response = "Invalid ID format";
+                t.sendResponseHeaders(400, response.length()); // Bad Request
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        } else if(pathComponents.length == 3) {
             try {
                 int id = Integer.parseInt(pathComponents[2]);
                 boolean isDeleted = customerController.deleteCustomer(id);
