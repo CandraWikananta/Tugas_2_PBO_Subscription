@@ -56,7 +56,10 @@ public class CustomerController {
     public Customer getCustomerById(int id) {
         Customer customer = null;
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT * FROM Customer WHERE id = ?";
+            String sql = "SELECT c.id, c.email, c.first_name, c.last_name, c.phone_number, s.line1 " +
+                    "FROM Customer c " +
+                    "LEFT JOIN Shipping_addresses s ON c.id = s.customer " +
+                    "WHERE c.id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -67,6 +70,7 @@ public class CustomerController {
                 customer.setLast_name(rs.getString("last_name"));
                 customer.setEmail(rs.getString("email"));
                 customer.setPhone_number(rs.getString("phone_number"));
+                customer.setShippingAddressesLine1(rs.getString("line1"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

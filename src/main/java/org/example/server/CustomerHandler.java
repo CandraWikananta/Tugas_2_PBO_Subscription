@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CustomerHandler implements HttpHandler {
     private final String apiKey;
-    private final CustomerController controller = new CustomerController();
+    private final CustomerController customerController = new CustomerController();
 
     public CustomerHandler(String apiKey) {
         this.apiKey = apiKey;
@@ -30,22 +30,23 @@ public class CustomerHandler implements HttpHandler {
         }
 
         String method = t.getRequestMethod();
+        String path = t.getRequestURI().getPath();
         if (method.equals("GET")) {
-            handleGetRequest(t);
+            handleGetCustomerRequest(t);
         } else if (method.equals("POST")) {
-            handlePostRequest(t);
+            handlePostCustomerRequest(t);
         } else {
             t.sendResponseHeaders(405, -1); // Method Not Allowed
         }
     }
 
-    private void handleGetRequest(HttpExchange t) throws IOException {
+    private void handleGetCustomerRequest(HttpExchange t) throws IOException {
         String path = t.getRequestURI().getPath();
         String[] pathComponents = path.split("/");
-        if (pathComponents.length == 3) {
+        if (pathComponents.length == 3) { // Expecting /Customer/{id}
             try {
                 int id = Integer.parseInt(pathComponents[2]);
-                Customer customer = controller.getCustomerById(id);
+                Customer customer = customerController.getCustomerById(id);
                 if (customer != null) {
                     String json = new Gson().toJson(customer);
                     t.sendResponseHeaders(200, json.length());
@@ -67,7 +68,7 @@ public class CustomerHandler implements HttpHandler {
                 os.close();
             }
         } else {
-            List<Customer> customers = controller.getAllCustomers();
+            List<Customer> customers = customerController.getAllCustomers();
             String json = new Gson().toJson(customers);
             t.sendResponseHeaders(200, json.length());
             OutputStream os = t.getResponseBody();
@@ -76,12 +77,12 @@ public class CustomerHandler implements HttpHandler {
         }
     }
 
-    private void handlePostRequest(HttpExchange t) throws IOException {
+    private void handlePostCustomerRequest(HttpExchange t) throws IOException {
         InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
         Customer customer = new Gson().fromJson(isr, Customer.class);
-        boolean success = controller.addCustomer(customer);
-        String response = success ? "Error creating customer" : "Customer created successfully";
-        t.sendResponseHeaders(success ? 500 : 201, response.length());
+        boolean success = customerController.addCustomer(customer);
+        String response = success ? "Customer created successfully" : "Error creating customer";
+        t.sendResponseHeaders(success ? 201 : 500, response.length());
         OutputStream os = t.getResponseBody();
         os.write(response.getBytes());
         os.close();

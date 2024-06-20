@@ -6,6 +6,7 @@ public class Customer {
     private String first_name;
     private String last_name;
     private String phone_number;
+    private String ShippingAddressesLine1;
 
     public Customer(int id, String email, String first_name, String last_name, String phone_number) {
         this.id = id;
@@ -57,5 +58,13 @@ public class Customer {
 
     public void setPhone_number(String phone_number) {
         this.phone_number = phone_number;
+    }
+
+    public String getShippingAddressesLine1() {
+        return ShippingAddressesLine1;
+    }
+
+    public void setShippingAddressesLine1(String shippingAddressesLine1) {
+        ShippingAddressesLine1 = shippingAddressesLine1;
     }
 }
