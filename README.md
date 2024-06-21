@@ -6,11 +6,129 @@ NIM     : 2305551065
 Nama    : Made Septino Budi Putrawan 
 NIM     : 2305551083
 
+## Daftar Isi
+
+- [API Subscription](#tugas-2--pembuatan-api-subscription-sederhana)
+    - [Pengenalan](#perkenalan)
+    - [Struktur Program](#struktur-program)
+    - [Prasyarat](#prasyarat)
+    - [Batasan Program](#batasan-program)
+    - [Penggunaan](#penggunaan)
+        - [Clone Repo](#clone-repository)
+        - [Install Maven](#install-maven)
+        - [Run Main.java](#jalankan-mainjava)
+    - [API-Key](#api-key)
+    - [Spesifikasi API](#spesifikasi-api)
+        - [GET CUSTOMER](#spesifikasi-api-get-customer)
+        - [GET Subscriptions](#spesifikasi-api-get-subscriptions)
+        - [GET Items](#spesifikasi-api-get-items)
+        - [POST](#spesifikasi-api-post)
+        - [PUT](#spesifikasi-api-put)
+        - [DELETE](#spesifikasi-api-delete)
+    - [Test pada program Postman](#test-program-dengan-postman)
+
 ## Perkenalan
 Tugas 2 ini merupakan tugas yang mengharuskan mahasiswa untuk membuat sebuah backend API menggunakan bahasa pemrograman Java untuk sebuah sistem Subscrption sederhana. API ini nantinya akan digunakan untuk memanipulasi dan mengakses data pada sebuah database. API ini juga dapat meng-handle GET, POST, PUT, dan DELETE. Database nantinya akan disimpan pada software SQLite. Respon yang diberikan oleh server API dalam format JSON. Dan pengujian API dilakukan dengan software Postman.
 
 ## Struktur Program
 API ini memiliki beberapa class yaitu class Controller, class Models, dan class Server. Masing - masing class memiliki fungsinya sendiri. Class untuk penempatan entitas ada pada class Models, class untuk keperluan database ada pada class Controller, dan untuk keperluan API ada pada class Server.
+
+## Prasyarat
+Adapun beberap prasyarat untuk menjalankan program ini yaitu:
+
+- JDK versi 21
+[Download JDK](https://www.oracle.com/id/java/technologies/downloads/)
+
+- SQLite JDBC versi 3.23.1 or above
+[Download SQLite](https://www.sqlite.org/download.html)
+
+- Apache Maven versi 3.9.8
+[Download Maven](https://maven.apache.org/download.cgi)
+
+## Batasan Program
+- Batasan dari program ini adalah hanya dapat menggunakan metode GET, POST, PUT dan DELETE.
+- Tidak diperkenankan kesalahan dalam penulisan nama tabel, berikut daftar tabel dengan penulisan yang tepat:
+
+```
+Customers
+Subscriptions
+Items
+Shipping_addresses
+Cards
+```
+
+## Penggunaan
+Berikut adalah langkah-langkah cara untuk menggunakan program backend API untuk sistem pembayaran subscription ini.
+
+### Clone Repository
+Lakukan _cloning_ pada repository ini dengan menggunakan _command_ git sebagai berikut:
+
+```
+$ git clone https://github.com/CandraWikananta/Tugas_2_PBO_Subscription
+```
+
+### Install Maven
+Setelah melakukakan _cloning_, Anda harus memenuhi prasyarat pada bagian sebelumnya yaitu menginstall maven, karena program ini menggunakan Maven sebagau _build system_-nya, maka untuk melakukan instalasi gunakan _command_ berikut:
+
+```
+$ mvn install
+```
+
+### Jalankan Main.java
+Jalankan `org.example.Main.main` untuk menggunakan program API ini pada:
+
+```
+localhost:9065
+```
+
+## API-Key
+Program API ini juga menggunakan _API Key_ yang di _hardcoded_ pada kelas Main.java, untuk menggunakan program API ini pada POSTMAN harus menambahkan "API-Key" pada _Header_ dan _Value_ "API-Subscription-Key" untuk mendapatkan akses pada program API ini. Berikut adalah contoh memasukkan APi-Key.
+![alt text](<IMG/Mendapatkan akses API-Key.png>)
+
+## Spesifikasi API
+Adapun juga beberapa spesifikasi API yang hanya dapat digunakan pada program ini yaitu sebagai berikut:
+
+### Spesifikasi API GET Customer
+- GET/customers => daftar semua pelanggan
+- GET/customers/{id} => informasi pelanggan dan alamatnya
+- GET/customers/{id}/cards => daftar kartu kredit/debit milik pelanggan
+- GET/customers/{id}/subscriptions => daftar semua subscriptions milik
+pelanggan
+- GET/customers/{id}/subscriptions?subscriptions_status={active, cancelled,
+non-renewing} => daftar semua subscriptions milik pelanggan yg berstatus
+aktif / cancelled / non-renewing
+
+### Spesifikasi API GET Subscriptions
+- GET /subscriptions => daftar semua subscriptions
+- GET /subscriptions?sort_by=current_term_end&sort_type=desc => daftar
+semua subscriptions diurutkan berdasarkan current_term_end secara
+descending
+- GET /subscriptions/{id} =>
+    - informasi subscription,
+    - customer: id, first_name, last_name,
+    - subscription_items: quantity, amount,
+    - item: id, name, price, type
+
+### Spesifikasi API GET Items
+- GET /items => daftar semua produk
+- GET /items?is_active=true => daftar semua produk yg memiliki status aktif
+- GET /items/{id} => informasi produk
+
+### Spesifikasi API POST
+- POST /customers => buat pelanggan baru
+- POST /subscriptions => buat subscription baru beserta dengan id customer,
+shipping address, card, dan item yg dibeli
+- POST /items => buat item baru
+
+### Spesifikasi API PUT
+- PUT /customers/{id}
+- PUT /customers/{id}/shipping_addresses/{id}
+- PUT /items/{id}
+
+### Spesifikasi API DELETE
+- DELETE /items/{id} => mengubah status item is_active menjadi false
+- DELETE /customers/{id}/cards/{id} => menghapus informasi kartu kredit
+pelanggan jika is_primary bernilai false
 
 ## Test Program dengan POSTMAN
 
